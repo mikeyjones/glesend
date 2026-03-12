@@ -7,6 +7,8 @@
 gleam add glesend@1
 ```
 
+`glesend` is a Gleam client library for the [Resend](https://resend.com) API. It provides typed access to common Resend features such as sending emails, managing audiences and contacts, working with templates and webhooks, and reading received emails.
+
 ## Send an email
 
 ```gleam
