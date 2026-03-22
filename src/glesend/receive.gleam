@@ -1,5 +1,6 @@
+import gleam/dict
 import gleam/dynamic/decode
-import gleam/option.{type Option, None}
+import gleam/option.{type Option, None, unwrap}
 import glesend
 import glesend/http
 import glesend/types
@@ -17,6 +18,7 @@ pub type ReceivedEmail {
     cc: List(String),
     bcc: List(String),
     message_id: Option(String),
+    headers: dict.Dict(String, String),
     attachments: List(ReceivedEmailAttachment),
   )
 }
@@ -208,6 +210,14 @@ pub fn received_email_decoder() -> decode.Decoder(ReceivedEmail) {
       None,
       decode.optional(decode.string),
     )
+    use headers <- decode.optional_field(
+      "headers",
+      dict.new(),
+      decode.map(
+        decode.optional(decode.dict(decode.string, decode.string)),
+        fn(opt) { unwrap(opt, dict.new()) },
+      ),
+    )
     use attachments <- decode.optional_field(
       "attachments",
       [],
@@ -225,6 +235,7 @@ pub fn received_email_decoder() -> decode.Decoder(ReceivedEmail) {
       cc: cc,
       bcc: bcc,
       message_id: message_id,
+      headers: headers,
       attachments: attachments,
     ))
   }

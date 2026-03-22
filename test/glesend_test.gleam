@@ -1,3 +1,4 @@
+import gleam/dict
 import gleam/json
 import gleam/option.{None, Some}
 import gleeunit
@@ -317,6 +318,7 @@ pub fn received_email_decoder_test() {
         cc: ["cc@example.com"],
         bcc: ["bcc@example.com"],
         message_id: Some("<id@host>"),
+        headers: dict.new(),
         attachments: [],
       ),
     )
@@ -342,6 +344,7 @@ pub fn received_email_decoder_legacy_string_addresses_test() {
         cc: ["cc@example.com"],
         bcc: ["bcc@example.com"],
         message_id: None,
+        headers: dict.new(),
         attachments: [],
       ),
     )
@@ -367,6 +370,7 @@ pub fn received_email_decoder_optional_fields_test() {
         cc: [],
         bcc: [],
         message_id: None,
+        headers: dict.new(),
         attachments: [],
       ),
     )
@@ -400,6 +404,7 @@ pub fn list_received_emails_response_resend_shape_test() {
           message_id: Some(
             "<CAMaFO1450g_CiTO_qnEmHw78RG4=aa=5uz4nD+YUpWiRJX5eUg@mail.gmail.com>",
           ),
+          headers: dict.new(),
           attachments: [],
         ),
       ]),
@@ -431,6 +436,7 @@ pub fn list_received_emails_response_decoder_test() {
           cc: [],
           bcc: [],
           message_id: None,
+          headers: dict.new(),
           attachments: [],
         ),
       ]),
@@ -438,7 +444,7 @@ pub fn list_received_emails_response_decoder_test() {
 }
 
 pub fn received_email_decoder_single_get_test() {
-  // GET /emails/receiving/:id — extra keys (object, headers, raw) ignored.
+  // GET /emails/receiving/:id — `object` and `raw` ignored; `headers` decoded.
   let json_string =
     "{\"object\":\"email\",\"id\":\"4ef9a417-02e9-4d39-ad75-9611e0fcc33c\",\"to\":[\"delivered@resend.dev\"],\"from\":\"Acme <onboarding@resend.dev>\",\"created_at\":\"2023-04-03T22:13:42.674981+00:00\",\"subject\":\"Hello World\",\"html\":\"Congrats on sending your <strong>first email</strong>!\",\"text\":null,\"headers\":{\"return-path\":\"lucas.costa@resend.com\",\"mime-version\":\"1.0\"},\"bcc\":[],\"cc\":[],\"reply_to\":[],\"message_id\":\"<example+123>\",\"raw\":{\"download_url\":\"https://example.resend.com/receiving/raw/054da427-439a-4e91-b785-e4fb1966285f?Signature=...\",\"expires_at\":\"2023-04-03T23:13:42.674981+00:00\"},\"attachments\":[{\"id\":\"2a0c9ce0-3112-4728-976e-47ddcd16a318\",\"filename\":\"avatar.png\",\"content_type\":\"image/png\",\"content_disposition\":\"inline\",\"content_id\":\"img001\"},{\"id\":\"3b1d0df1-4223-5839-087f-54eedd27b419\",\"filename\":\"document.pdf\",\"content_type\":\"application/pdf\",\"content_disposition\":null,\"content_id\":null}]}"
 
@@ -458,6 +464,10 @@ pub fn received_email_decoder_single_get_test() {
         cc: [],
         bcc: [],
         message_id: Some("<example+123>"),
+        headers: dict.from_list([
+          #("return-path", "lucas.costa@resend.com"),
+          #("mime-version", "1.0"),
+        ]),
         attachments: [
           receive.ReceivedEmailAttachment(
             id: "2a0c9ce0-3112-4728-976e-47ddcd16a318",
