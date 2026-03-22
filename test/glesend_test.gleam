@@ -299,6 +299,29 @@ pub fn contact_create_request_body_all_none_test() {
 
 pub fn received_email_decoder_test() {
   let json_string =
+    "{\"id\":\"recv_1\",\"from\":\"sender@example.com\",\"to\":[\"inbox@example.com\"],\"subject\":\"Hello\",\"html\":\"<p>Hi</p>\",\"text\":\"Hi\",\"created_at\":\"2026-03-12T10:00:00Z\",\"reply_to\":[\"reply@example.com\"],\"cc\":[\"cc@example.com\"],\"bcc\":[\"bcc@example.com\"],\"message_id\":\"<id@host>\",\"attachments\":[]}"
+
+  let result = json.parse(json_string, using: receive.received_email_decoder())
+
+  assert result
+    == Ok(receive.ReceivedEmail(
+      id: "recv_1",
+      from: "sender@example.com",
+      to: ["inbox@example.com"],
+      subject: "Hello",
+      html: Some("<p>Hi</p>"),
+      text: Some("Hi"),
+      created_at: "2026-03-12T10:00:00Z",
+      reply_to: ["reply@example.com"],
+      cc: ["cc@example.com"],
+      bcc: ["bcc@example.com"],
+      message_id: Some("<id@host>"),
+      attachments: [],
+    ))
+}
+
+pub fn received_email_decoder_legacy_string_addresses_test() {
+  let json_string =
     "{\"id\":\"recv_1\",\"from\":\"sender@example.com\",\"to\":\"inbox@example.com\",\"subject\":\"Hello\",\"html\":\"<p>Hi</p>\",\"text\":\"Hi\",\"created_at\":\"2026-03-12T10:00:00Z\",\"reply_to\":\"reply@example.com\",\"cc\":\"cc@example.com\",\"bcc\":\"bcc@example.com\"}"
 
   let result = json.parse(json_string, using: receive.received_email_decoder())
@@ -307,20 +330,22 @@ pub fn received_email_decoder_test() {
     == Ok(receive.ReceivedEmail(
       id: "recv_1",
       from: "sender@example.com",
-      to: "inbox@example.com",
+      to: ["inbox@example.com"],
       subject: "Hello",
       html: Some("<p>Hi</p>"),
       text: Some("Hi"),
       created_at: "2026-03-12T10:00:00Z",
-      reply_to: Some("reply@example.com"),
-      cc: Some("cc@example.com"),
-      bcc: Some("bcc@example.com"),
+      reply_to: ["reply@example.com"],
+      cc: ["cc@example.com"],
+      bcc: ["bcc@example.com"],
+      message_id: None,
+      attachments: [],
     ))
 }
 
 pub fn received_email_decoder_optional_fields_test() {
   let json_string =
-    "{\"id\":\"recv_1\",\"from\":\"sender@example.com\",\"to\":\"inbox@example.com\",\"subject\":\"Hello\",\"html\":null,\"text\":null,\"created_at\":\"2026-03-12T10:00:00Z\",\"reply_to\":null,\"cc\":null,\"bcc\":null}"
+    "{\"id\":\"recv_1\",\"from\":\"sender@example.com\",\"to\":[\"inbox@example.com\"],\"subject\":\"Hello\",\"html\":null,\"text\":null,\"created_at\":\"2026-03-12T10:00:00Z\",\"reply_to\":null,\"cc\":null,\"bcc\":null}"
 
   let result = json.parse(json_string, using: receive.received_email_decoder())
 
@@ -328,20 +353,23 @@ pub fn received_email_decoder_optional_fields_test() {
     == Ok(receive.ReceivedEmail(
       id: "recv_1",
       from: "sender@example.com",
-      to: "inbox@example.com",
+      to: ["inbox@example.com"],
       subject: "Hello",
       html: None,
       text: None,
       created_at: "2026-03-12T10:00:00Z",
-      reply_to: None,
-      cc: None,
-      bcc: None,
+      reply_to: [],
+      cc: [],
+      bcc: [],
+      message_id: None,
+      attachments: [],
     ))
 }
 
-pub fn list_received_emails_response_decoder_test() {
+pub fn list_received_emails_response_resend_shape_test() {
+  // Mirrors Resend receiving list: array addressing, no html/text keys.
   let json_string =
-    "{\"data\":[{\"id\":\"recv_1\",\"from\":\"sender@example.com\",\"to\":\"inbox@example.com\",\"subject\":\"Hello\",\"html\":null,\"text\":\"Hi\",\"created_at\":\"2026-03-12T10:00:00Z\",\"reply_to\":null,\"cc\":null,\"bcc\":null}]}"
+    "{\"data\":[{\"cc\":[],\"id\":\"4c20261a-25fd-4f34-8e69-d74247539046\",\"to\":[\"test2-ycwzob@email.testyusers.com\"],\"bcc\":[],\"from\":\"mikeyj2009@googlemail.com\",\"subject\":\"test\",\"reply_to\":[],\"created_at\":\"2026-03-22 17:18:52.128297+00\",\"message_id\":\"<CAMaFO1450g_CiTO_qnEmHw78RG4=aa=5uz4nD+YUpWiRJX5eUg@mail.gmail.com>\",\"attachments\":[]}],\"object\":\"list\",\"has_more\":false}"
 
   let result =
     json.parse(
@@ -351,21 +379,123 @@ pub fn list_received_emails_response_decoder_test() {
 
   assert result
     == Ok(
-      receive.ListReceivedEmailsResponse(data: [
-        receive.ReceivedEmail(
-          id: "recv_1",
-          from: "sender@example.com",
-          to: "inbox@example.com",
-          subject: "Hello",
-          html: None,
-          text: Some("Hi"),
-          created_at: "2026-03-12T10:00:00Z",
-          reply_to: None,
-          cc: None,
-          bcc: None,
-        ),
-      ]),
+      receive.ListReceivedEmailsResponse(
+        object: "list",
+        has_more: False,
+        data: [
+          receive.ReceivedEmail(
+            id: "4c20261a-25fd-4f34-8e69-d74247539046",
+            from: "mikeyj2009@googlemail.com",
+            to: ["test2-ycwzob@email.testyusers.com"],
+            subject: "test",
+            html: None,
+            text: None,
+            created_at: "2026-03-22 17:18:52.128297+00",
+            reply_to: [],
+            cc: [],
+            bcc: [],
+            message_id: Some(
+              "<CAMaFO1450g_CiTO_qnEmHw78RG4=aa=5uz4nD+YUpWiRJX5eUg@mail.gmail.com>",
+            ),
+            attachments: [],
+          ),
+        ],
+      ),
     )
+}
+
+pub fn list_received_emails_response_decoder_test() {
+  let json_string =
+    "{\"object\":\"list\",\"has_more\":false,\"data\":[{\"id\":\"recv_1\",\"from\":\"sender@example.com\",\"to\":[\"inbox@example.com\"],\"subject\":\"Hello\",\"html\":null,\"text\":\"Hi\",\"created_at\":\"2026-03-12T10:00:00Z\",\"reply_to\":[],\"cc\":[],\"bcc\":[],\"message_id\":null,\"attachments\":[]}]}"
+
+  let result =
+    json.parse(
+      json_string,
+      using: receive.list_received_emails_response_decoder(),
+    )
+
+  assert result
+    == Ok(
+      receive.ListReceivedEmailsResponse(
+        object: "list",
+        has_more: False,
+        data: [
+          receive.ReceivedEmail(
+            id: "recv_1",
+            from: "sender@example.com",
+            to: ["inbox@example.com"],
+            subject: "Hello",
+            html: None,
+            text: Some("Hi"),
+            created_at: "2026-03-12T10:00:00Z",
+            reply_to: [],
+            cc: [],
+            bcc: [],
+            message_id: None,
+            attachments: [],
+          ),
+        ],
+      ),
+    )
+}
+
+pub fn received_email_decoder_single_get_test() {
+  // GET /emails/receiving/:id — extra keys (object, headers, raw) ignored.
+  let json_string =
+    "{\"object\":\"email\",\"id\":\"4ef9a417-02e9-4d39-ad75-9611e0fcc33c\",\"to\":[\"delivered@resend.dev\"],\"from\":\"Acme <onboarding@resend.dev>\",\"created_at\":\"2023-04-03T22:13:42.674981+00:00\",\"subject\":\"Hello World\",\"html\":\"Congrats on sending your <strong>first email</strong>!\",\"text\":null,\"headers\":{\"return-path\":\"lucas.costa@resend.com\",\"mime-version\":\"1.0\"},\"bcc\":[],\"cc\":[],\"reply_to\":[],\"message_id\":\"<example+123>\",\"raw\":{\"download_url\":\"https://example.resend.com/receiving/raw/054da427-439a-4e91-b785-e4fb1966285f?Signature=...\",\"expires_at\":\"2023-04-03T23:13:42.674981+00:00\"},\"attachments\":[{\"id\":\"2a0c9ce0-3112-4728-976e-47ddcd16a318\",\"filename\":\"avatar.png\",\"content_type\":\"image/png\",\"content_disposition\":\"inline\",\"content_id\":\"img001\"},{\"id\":\"3b1d0df1-4223-5839-087f-54eedd27b419\",\"filename\":\"document.pdf\",\"content_type\":\"application/pdf\",\"content_disposition\":null,\"content_id\":null}]}"
+
+  let result = json.parse(json_string, using: receive.received_email_decoder())
+
+  assert result
+    == Ok(receive.ReceivedEmail(
+      id: "4ef9a417-02e9-4d39-ad75-9611e0fcc33c",
+      from: "Acme <onboarding@resend.dev>",
+      to: ["delivered@resend.dev"],
+      subject: "Hello World",
+      html: Some("Congrats on sending your <strong>first email</strong>!"),
+      text: None,
+      created_at: "2023-04-03T22:13:42.674981+00:00",
+      reply_to: [],
+      cc: [],
+      bcc: [],
+      message_id: Some("<example+123>"),
+      attachments: [
+        receive.ReceivedEmailAttachment(
+          id: "2a0c9ce0-3112-4728-976e-47ddcd16a318",
+          filename: "avatar.png",
+          content_type: "image/png",
+          size: None,
+          content_disposition: Some("inline"),
+          content_id: Some("img001"),
+        ),
+        receive.ReceivedEmailAttachment(
+          id: "3b1d0df1-4223-5839-087f-54eedd27b419",
+          filename: "document.pdf",
+          content_type: "application/pdf",
+          size: None,
+          content_disposition: None,
+          content_id: None,
+        ),
+      ],
+    ))
+}
+
+pub fn received_email_attachment_decoder_with_size_test() {
+  let json_string =
+    "{\"id\":\"att_1\",\"filename\":\"f.bin\",\"content_type\":\"application/octet-stream\",\"size\":99}"
+
+  let result =
+    json.parse(json_string, using: receive.received_email_attachment_decoder())
+
+  assert result
+    == Ok(receive.ReceivedEmailAttachment(
+      id: "att_1",
+      filename: "f.bin",
+      content_type: "application/octet-stream",
+      size: Some(99),
+      content_disposition: None,
+      content_id: None,
+    ))
 }
 
 pub fn attachment_decoder_test() {
