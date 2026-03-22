@@ -124,16 +124,12 @@ pub fn get_attachment(
 /// Decodes `to` / `cc` / etc. as Resend returns: string arrays, with legacy
 /// single-string and JSON `null` tolerated.
 fn address_list_decoder() -> decode.Decoder(List(String)) {
-  decode.one_of(
-    decode.list(of: decode.string),
-    or: [
-      decode.then(decode.string, fn(s) { decode.success([s]) }),
-      decode.map(
-        decode.optional(decode.list(of: decode.string)),
-        fn(opt) { option.unwrap(opt, []) },
-      ),
-    ],
-  )
+  decode.one_of(decode.list(of: decode.string), or: [
+    decode.then(decode.string, fn(s) { decode.success([s]) }),
+    decode.map(decode.optional(decode.list(of: decode.string)), fn(opt) {
+      option.unwrap(opt, [])
+    }),
+  ])
 }
 
 /// Decodes a received email attachment summary.
@@ -153,16 +149,14 @@ pub fn attachment_decoder() -> decode.Decoder(Attachment) {
 }
 
 /// Decodes an attachment object embedded in a single received email response.
-pub fn received_email_attachment_decoder() -> decode.Decoder(ReceivedEmailAttachment) {
+pub fn received_email_attachment_decoder() -> decode.Decoder(
+  ReceivedEmailAttachment,
+) {
   {
     use id <- decode.field("id", decode.string)
     use filename <- decode.field("filename", decode.string)
     use content_type <- decode.field("content_type", decode.string)
-    use size <- decode.optional_field(
-      "size",
-      None,
-      decode.optional(decode.int),
-    )
+    use size <- decode.optional_field("size", None, decode.optional(decode.int))
     use content_disposition <- decode.optional_field(
       "content_disposition",
       None,
@@ -202,7 +196,11 @@ pub fn received_email_decoder() -> decode.Decoder(ReceivedEmail) {
       decode.optional(decode.string),
     )
     use created_at <- decode.field("created_at", decode.string)
-    use reply_to <- decode.optional_field("reply_to", [], address_list_decoder())
+    use reply_to <- decode.optional_field(
+      "reply_to",
+      [],
+      address_list_decoder(),
+    )
     use cc <- decode.optional_field("cc", [], address_list_decoder())
     use bcc <- decode.optional_field("bcc", [], address_list_decoder())
     use message_id <- decode.optional_field(

@@ -304,20 +304,22 @@ pub fn received_email_decoder_test() {
   let result = json.parse(json_string, using: receive.received_email_decoder())
 
   assert result
-    == Ok(receive.ReceivedEmail(
-      id: "recv_1",
-      from: "sender@example.com",
-      to: ["inbox@example.com"],
-      subject: "Hello",
-      html: Some("<p>Hi</p>"),
-      text: Some("Hi"),
-      created_at: "2026-03-12T10:00:00Z",
-      reply_to: ["reply@example.com"],
-      cc: ["cc@example.com"],
-      bcc: ["bcc@example.com"],
-      message_id: Some("<id@host>"),
-      attachments: [],
-    ))
+    == Ok(
+      receive.ReceivedEmail(
+        id: "recv_1",
+        from: "sender@example.com",
+        to: ["inbox@example.com"],
+        subject: "Hello",
+        html: Some("<p>Hi</p>"),
+        text: Some("Hi"),
+        created_at: "2026-03-12T10:00:00Z",
+        reply_to: ["reply@example.com"],
+        cc: ["cc@example.com"],
+        bcc: ["bcc@example.com"],
+        message_id: Some("<id@host>"),
+        attachments: [],
+      ),
+    )
 }
 
 pub fn received_email_decoder_legacy_string_addresses_test() {
@@ -327,20 +329,22 @@ pub fn received_email_decoder_legacy_string_addresses_test() {
   let result = json.parse(json_string, using: receive.received_email_decoder())
 
   assert result
-    == Ok(receive.ReceivedEmail(
-      id: "recv_1",
-      from: "sender@example.com",
-      to: ["inbox@example.com"],
-      subject: "Hello",
-      html: Some("<p>Hi</p>"),
-      text: Some("Hi"),
-      created_at: "2026-03-12T10:00:00Z",
-      reply_to: ["reply@example.com"],
-      cc: ["cc@example.com"],
-      bcc: ["bcc@example.com"],
-      message_id: None,
-      attachments: [],
-    ))
+    == Ok(
+      receive.ReceivedEmail(
+        id: "recv_1",
+        from: "sender@example.com",
+        to: ["inbox@example.com"],
+        subject: "Hello",
+        html: Some("<p>Hi</p>"),
+        text: Some("Hi"),
+        created_at: "2026-03-12T10:00:00Z",
+        reply_to: ["reply@example.com"],
+        cc: ["cc@example.com"],
+        bcc: ["bcc@example.com"],
+        message_id: None,
+        attachments: [],
+      ),
+    )
 }
 
 pub fn received_email_decoder_optional_fields_test() {
@@ -350,20 +354,22 @@ pub fn received_email_decoder_optional_fields_test() {
   let result = json.parse(json_string, using: receive.received_email_decoder())
 
   assert result
-    == Ok(receive.ReceivedEmail(
-      id: "recv_1",
-      from: "sender@example.com",
-      to: ["inbox@example.com"],
-      subject: "Hello",
-      html: None,
-      text: None,
-      created_at: "2026-03-12T10:00:00Z",
-      reply_to: [],
-      cc: [],
-      bcc: [],
-      message_id: None,
-      attachments: [],
-    ))
+    == Ok(
+      receive.ReceivedEmail(
+        id: "recv_1",
+        from: "sender@example.com",
+        to: ["inbox@example.com"],
+        subject: "Hello",
+        html: None,
+        text: None,
+        created_at: "2026-03-12T10:00:00Z",
+        reply_to: [],
+        cc: [],
+        bcc: [],
+        message_id: None,
+        attachments: [],
+      ),
+    )
 }
 
 pub fn list_received_emails_response_resend_shape_test() {
@@ -379,28 +385,24 @@ pub fn list_received_emails_response_resend_shape_test() {
 
   assert result
     == Ok(
-      receive.ListReceivedEmailsResponse(
-        object: "list",
-        has_more: False,
-        data: [
-          receive.ReceivedEmail(
-            id: "4c20261a-25fd-4f34-8e69-d74247539046",
-            from: "mikeyj2009@googlemail.com",
-            to: ["test2-ycwzob@email.testyusers.com"],
-            subject: "test",
-            html: None,
-            text: None,
-            created_at: "2026-03-22 17:18:52.128297+00",
-            reply_to: [],
-            cc: [],
-            bcc: [],
-            message_id: Some(
-              "<CAMaFO1450g_CiTO_qnEmHw78RG4=aa=5uz4nD+YUpWiRJX5eUg@mail.gmail.com>",
-            ),
-            attachments: [],
+      receive.ListReceivedEmailsResponse(object: "list", has_more: False, data: [
+        receive.ReceivedEmail(
+          id: "4c20261a-25fd-4f34-8e69-d74247539046",
+          from: "mikeyj2009@googlemail.com",
+          to: ["test2-ycwzob@email.testyusers.com"],
+          subject: "test",
+          html: None,
+          text: None,
+          created_at: "2026-03-22 17:18:52.128297+00",
+          reply_to: [],
+          cc: [],
+          bcc: [],
+          message_id: Some(
+            "<CAMaFO1450g_CiTO_qnEmHw78RG4=aa=5uz4nD+YUpWiRJX5eUg@mail.gmail.com>",
           ),
-        ],
-      ),
+          attachments: [],
+        ),
+      ]),
     )
 }
 
@@ -416,26 +418,22 @@ pub fn list_received_emails_response_decoder_test() {
 
   assert result
     == Ok(
-      receive.ListReceivedEmailsResponse(
-        object: "list",
-        has_more: False,
-        data: [
-          receive.ReceivedEmail(
-            id: "recv_1",
-            from: "sender@example.com",
-            to: ["inbox@example.com"],
-            subject: "Hello",
-            html: None,
-            text: Some("Hi"),
-            created_at: "2026-03-12T10:00:00Z",
-            reply_to: [],
-            cc: [],
-            bcc: [],
-            message_id: None,
-            attachments: [],
-          ),
-        ],
-      ),
+      receive.ListReceivedEmailsResponse(object: "list", has_more: False, data: [
+        receive.ReceivedEmail(
+          id: "recv_1",
+          from: "sender@example.com",
+          to: ["inbox@example.com"],
+          subject: "Hello",
+          html: None,
+          text: Some("Hi"),
+          created_at: "2026-03-12T10:00:00Z",
+          reply_to: [],
+          cc: [],
+          bcc: [],
+          message_id: None,
+          attachments: [],
+        ),
+      ]),
     )
 }
 
@@ -447,37 +445,39 @@ pub fn received_email_decoder_single_get_test() {
   let result = json.parse(json_string, using: receive.received_email_decoder())
 
   assert result
-    == Ok(receive.ReceivedEmail(
-      id: "4ef9a417-02e9-4d39-ad75-9611e0fcc33c",
-      from: "Acme <onboarding@resend.dev>",
-      to: ["delivered@resend.dev"],
-      subject: "Hello World",
-      html: Some("Congrats on sending your <strong>first email</strong>!"),
-      text: None,
-      created_at: "2023-04-03T22:13:42.674981+00:00",
-      reply_to: [],
-      cc: [],
-      bcc: [],
-      message_id: Some("<example+123>"),
-      attachments: [
-        receive.ReceivedEmailAttachment(
-          id: "2a0c9ce0-3112-4728-976e-47ddcd16a318",
-          filename: "avatar.png",
-          content_type: "image/png",
-          size: None,
-          content_disposition: Some("inline"),
-          content_id: Some("img001"),
-        ),
-        receive.ReceivedEmailAttachment(
-          id: "3b1d0df1-4223-5839-087f-54eedd27b419",
-          filename: "document.pdf",
-          content_type: "application/pdf",
-          size: None,
-          content_disposition: None,
-          content_id: None,
-        ),
-      ],
-    ))
+    == Ok(
+      receive.ReceivedEmail(
+        id: "4ef9a417-02e9-4d39-ad75-9611e0fcc33c",
+        from: "Acme <onboarding@resend.dev>",
+        to: ["delivered@resend.dev"],
+        subject: "Hello World",
+        html: Some("Congrats on sending your <strong>first email</strong>!"),
+        text: None,
+        created_at: "2023-04-03T22:13:42.674981+00:00",
+        reply_to: [],
+        cc: [],
+        bcc: [],
+        message_id: Some("<example+123>"),
+        attachments: [
+          receive.ReceivedEmailAttachment(
+            id: "2a0c9ce0-3112-4728-976e-47ddcd16a318",
+            filename: "avatar.png",
+            content_type: "image/png",
+            size: None,
+            content_disposition: Some("inline"),
+            content_id: Some("img001"),
+          ),
+          receive.ReceivedEmailAttachment(
+            id: "3b1d0df1-4223-5839-087f-54eedd27b419",
+            filename: "document.pdf",
+            content_type: "application/pdf",
+            size: None,
+            content_disposition: None,
+            content_id: None,
+          ),
+        ],
+      ),
+    )
 }
 
 pub fn received_email_attachment_decoder_with_size_test() {
